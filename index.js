@@ -2,8 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const db = require("./db"); // Panggil koneksi Neon
+
 const app = express();
-const PORT = process.env.PORT || 3001; // Port 3001 untuk Vendor A
+const PORT = process.env.PORT || 3001;
 
 // === MIDDLEWARE ===
 app.use(cors());
@@ -13,33 +14,29 @@ app.get("/status", (req, res) => {
   res.json({ ok: true, service: "vendor-a-api" });
 });
 
-// === Vendor A API Route: Semua data dikembalikan sebagai STRING ===
+// === Vendor A API Route: Semua nilai dikembalikan sebagai STRING ===
 app.get("/products", async (req, res, next) => {
   try {
-    // Query untuk mengambil semua data dari tabel Vendor A
+    // SQL aman dan bersih
     const sql = `
-      SELECT kd_produk, nm_brg, hrg, ket_stok 
-      FROM products_vendor_a 
+      SELECT kd_produk, nm_brg, hrg, ket_stok
+      FROM products_vendor_a
       ORDER BY kd_produk ASC
     `;
-    const result = await db.query(sql);
-    
-    // Memformat data: WAJIB memastikan semua nilai (terutama hrg) adalah STRING
+
+const result = await db.query(sql);
+
     const legacyData = result.rows.map(row => ({
-      // kd_produk dan nm_brg otomatis string dari DB
-      kd_produk: String(row.kd_produk), 
+      kd_produk: String(row.kd_produk),
       nm_brg: String(row.nm_brg),
-      
-      // Konversi harga (hrg) menjadi STRING
       hrg: String(row.hrg),
-      
-      // Konversi status stok (ket_stok) menjadi STRING
-      ket_stok: String(row.ket_stok), 
+      ket_stok: String(row.ket_stok)
     }));
-    
-    res.json(legacyData); 
+
+    res.json(legacyData);
+
   } catch (err) {
-    console.error("Error fetching data from Vendor A DB:", err.stack);
+    console.error("Error fetching data from Vendor A DB:", err);
     next(err);
   }
 });
@@ -50,9 +47,10 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error("[SERVER ERROR M1]", err.stack);
+  console.error("[SERVER ERROR M1]", err);
   res.status(500).json({ error: "Terjadi kesalahan pada server M1" });
 });
+
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server M1 aktif di http://localhost:${PORT}`);
