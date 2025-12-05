@@ -56,3 +56,5 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server M1 aktif di http://localhost:${PORT}`);
 
 });
+
+module.exports = app;
