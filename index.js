@@ -9,10 +9,12 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Status API
 app.get("/status", (req, res) => {
   res.json({ ok: true, service: "vendor-a-api" });
 });
 
+// Products
 app.get("/products", async (req, res, next) => {
   try {
     const sql = `
@@ -38,10 +40,12 @@ app.get("/products", async (req, res, next) => {
   }
 });
 
+// 404 Handler
 app.use((req, res) => {
   res.status(404).json({ error: "Rute tidak ditemukan" });
 });
 
+// Error Handler
 app.use((err, req, res, next) => {
   console.error("[SERVER ERROR M1]", err);
   res.status(500).json({ error: "Terjadi kesalahan pada server M1" });
