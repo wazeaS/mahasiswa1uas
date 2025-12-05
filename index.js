@@ -1,12 +1,11 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const db = require("./db"); // Panggil koneksi Neon
+const db = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// === MIDDLEWARE ===
 app.use(cors());
 app.use(express.json());
 
@@ -14,23 +13,21 @@ app.get("/status", (req, res) => {
   res.json({ ok: true, service: "vendor-a-api" });
 });
 
-// === Vendor A API Route: Semua nilai dikembalikan sebagai STRING ===
 app.get("/products", async (req, res, next) => {
   try {
-    // SQL aman dan bersih
     const sql = `
-      SELECT kd_produk, nm_brg, hrg, ket_stok
+      SELECT product_code, product_name, price, stock_status
       FROM products_vendor_a
-      ORDER BY kd_produk ASC
+      ORDER BY product_code ASC
     `;
 
-const result = await db.query(sql);
+    const result = await db.query(sql);
 
     const legacyData = result.rows.map(row => ({
-      kd_produk: String(row.kd_produk),
-      nm_brg: String(row.nm_brg),
-      hrg: String(row.hrg),
-      ket_stok: String(row.ket_stok)
+      kd_produk: String(row.product_code),
+      nm_brg: String(row.product_name),
+      hrg: String(row.price),
+      ket_stok: String(row.stock_status)
     }));
 
     res.json(legacyData);
@@ -41,7 +38,6 @@ const result = await db.query(sql);
   }
 });
 
-// === FALLBACK & ERROR HANDLING ===
 app.use((req, res) => {
   res.status(404).json({ error: "Rute tidak ditemukan" });
 });
