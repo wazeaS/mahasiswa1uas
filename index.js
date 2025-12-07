@@ -15,7 +15,7 @@ app.get("/status", (req, res) => {
 });
 
 // Products
-app.get("/products", async (req, res, next) => {
+app.get("/warung", async (req, res, next) => {
   try {
     const sql = `
       SELECT product_code, product_name, price, stock_status
