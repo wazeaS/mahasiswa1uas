@@ -1,12 +1,10 @@
-// mahasiswaX/db.js
-const { Pool } = require('pg');
+const { Pool } = require("pg");
 
-// Mengambil DATABASE_URL dari .env
+// Pool koneksi ke Neon DB
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Opsi SSL ini penting untuk koneksi ke layanan cloud seperti Neon
   ssl: {
-    rejectUnauthorized: false 
+    rejectUnauthorized: false // wajib untuk Neon/Vercel
   }
 });
 
