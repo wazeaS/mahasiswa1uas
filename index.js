@@ -9,16 +9,12 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-/* ===========================
-   STATUS API
-=========================== */
+// Status API
 app.get("/status", (req, res) => {
   res.json({ ok: true, service: "vendor-a-api" });
 });
 
-/* ===========================
-   PRODUCTS ENDPOINT
-=========================== */
+// Products
 app.get("/products", async (req, res, next) => {
   try {
     const sql = `
@@ -26,6 +22,7 @@ app.get("/products", async (req, res, next) => {
       FROM products_vendor_a
       ORDER BY product_code ASC
     `;
+
     const result = await db.query(sql);
 
     const legacyData = result.rows.map(row => ({
@@ -36,48 +33,19 @@ app.get("/products", async (req, res, next) => {
     }));
 
     res.json(legacyData);
+
   } catch (err) {
-    console.error("Error fetching products:", err);
+    console.error("Error fetching data from Vendor A DB:", err);
     next(err);
   }
 });
 
-/* ===========================
-   PROJECTS ENDPOINT
-=========================== */
-app.get("/projects", async (req, res, next) => {
-  try {
-    const sql = `
-      SELECT project_id, project_name, client, deadline
-      FROM projects
-      ORDER BY project_id ASC
-    `;
-    const result = await db.query(sql);
-
-    const formatted = result.rows.map(row => ({
-      id_proyek: String(row.project_id),
-      nama_proyek: String(row.project_name),
-      klien: String(row.client),
-      tenggat: String(row.deadline)
-    }));
-
-    res.json(formatted);
-  } catch (err) {
-    console.error("Error fetching projects:", err);
-    next(err);
-  }
-});
-
-/* ===========================
-   404 HANDLER
-=========================== */
+// 404 Handler
 app.use((req, res) => {
   res.status(404).json({ error: "Rute tidak ditemukan" });
 });
 
-/* ===========================
-   ERROR HANDLER
-=========================== */
+// Error Handler
 app.use((err, req, res, next) => {
   console.error("[SERVER ERROR M1]", err);
   res.status(500).json({ error: "Terjadi kesalahan pada server M1" });
